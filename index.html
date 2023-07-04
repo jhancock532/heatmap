@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Map App Demo</title>
+    <link rel="stylesheet" href="/leaflet.css" />
+    <script src="/leaflet.js"></script>
+    <script src="/world.js"></script>
+    <script src="/bristol.js"></script>
+    <style>
+      html,
+      body,
+      #map {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+      }
+
+      .number-marker-container {
+        width: 20px;
+        background-color: #fd5765;
+        border-radius: 50%;
+      }
+
+      .number-marker {
+        width: 100%;
+        text-align: center;
+        font-size: 1.5rem;
+        margin: 0px;
+        margin-top: 3px;
+        padding: 0px;
+        font-family: Apercu Pro, arial, helvetica, sans-serif;
+        font-weight: bold;
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      const highLevelLocations = [
+        {
+          name: "United Kingdom",
+          lat: 51.6,
+          lng: -2,
+          employees: 116,
+        },
+      ];
+
+      const lowLevelLocations = [
+        {
+          name: "Bristol",
+          lat: 51.454514,
+          lng: -2.58791,
+          employees: 43,
+        },
+        {
+          name: "Oxford",
+          lat: 51.8745,
+          lng: -1.479752,
+          employees: 53,
+        },
+        {
+          name: "London",
+          lat: 51.509865,
+          lng: -0.118092,
+          employees: 5,
+        },
+        {
+          name: "Manchester",
+          lat: 53.480759,
+          lng: -2.242631,
+          employees: 10,
+        },
+        {
+          name: "Edinburgh",
+          lat: 55.953251,
+          lng: -3.188267,
+          employees: 5,
+        },
+      ];
+
+      L.NumberedDivIcon = L.Icon.extend({
+        options: {
+          iconUrl: null,
+          number: "",
+          shadowUrl: null,
+          iconSize: new L.Point(40, 40),
+          iconAnchor: new L.Point(13, 41),
+          popupAnchor: new L.Point(6.5, -40),
+          className: "number-marker-container",
+        },
+
+        createIcon: function () {
+          var containerDiv = document.createElement("div");
+          var numberDiv = document.createElement("div");
+          numberDiv.setAttribute("class", "number-marker");
+          numberDiv.innerHTML = this.options["number"] || "";
+          containerDiv.appendChild(numberDiv);
+          this._setIconStyles(containerDiv, "icon");
+          return containerDiv;
+        },
+
+        //you could change this to add a shadow like in the normal marker if you really wanted
+        createShadow: function () {
+          return null;
+        },
+      });
+
+      var map = L.map("map", {
+        minZoom: 3,
+        maxZoom: 10,
+      }).setView([51.454514, -1.257677], 4);
+      L.tileLayer(
+        "http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+      ).addTo(map);
+
+      var lowLevelMarkers = new L.FeatureGroup();
+      var highLevelMarkers = new L.FeatureGroup();
+
+      lowLevelLocations.forEach((location) => {
+        var marker = new L.Marker([location.lat, location.lng], {
+          icon: new L.NumberedDivIcon({ number: location.employees }),
+        });
+
+        marker
+          .bindPopup(
+            `There are ${location.employees} employees in ${location.name}.`
+          )
+          .openPopup();
+
+        lowLevelMarkers.addLayer(marker);
+      });
+
+      highLevelLocations.forEach((location) => {
+        var marker = new L.Marker([location.lat, location.lng], {
+          icon: new L.NumberedDivIcon({ number: location.employees }),
+        });
+
+        marker
+          .bindPopup(
+            `There are ${location.employees} employees in ${location.name}.`
+          )
+          .openPopup();
+
+        highLevelMarkers.addLayer(marker);
+      });
+
+      map.addLayer(highLevelMarkers);
+
+      map.on("zoomend", function () {
+        if (map.getZoom() < 6) {
+          map.removeLayer(lowLevelMarkers);
+          map.addLayer(highLevelMarkers);
+        } else {
+          map.addLayer(lowLevelMarkers);
+          map.removeLayer(highLevelMarkers);
+        }
+      });
+    </script>
+  </body>
+</html>
