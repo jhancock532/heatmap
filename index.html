@@ -158,11 +158,11 @@
       });
 
       var map = L.map("map", {
-        minZoom: 3,
-        maxZoom: 10,
+        minZoom: 0,
+        maxZoom: 5,
       }).setView([51.454514, -1.257677], 4);
       L.tileLayer(
-        "http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+        'https://github.com/jhancock532/heatmap/raw/main/tiles/{z}/{x}/{y}.jpg'
       ).addTo(map);
 
       var lowLevelMarkers = new L.FeatureGroup();
