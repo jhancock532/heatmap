@@ -15,9 +15,14 @@
         margin: 0px;
       }
 
+      @font-face {
+        font-family: Outfit-Medium;
+        src: url(/heatmap/Outfit-Medium.ttf);
+      }
+
       .number-marker-container {
         width: 20px;
-        background-color: #fd5765;
+        background-color: rgba(37, 22, 87, 1);
         border-radius: 50%;
       }
 
@@ -28,9 +33,13 @@
         margin: 0px;
         margin-top: 3px;
         padding: 0px;
-        font-family: Apercu Pro, arial, helvetica, sans-serif;
+        font-family: Outfit-Medium, helvetica, arial, sans-serif;
         font-weight: bold;
         color: #ffffff;
+      }
+
+      .leaflet-container {
+        background: rgb(241, 241, 241);
       }
     </style>
   </head>
@@ -111,45 +120,82 @@
         "United States": 2,
       };
 
-      const highLevelLocations = [
+      const highlevelLocations = [
+        { name: "Budapest, Hungary", lat: 47.497, lng: 19.04, employees: 1 },
+        { name: "Alberta, Canada", lat: 53.933, lng: -116.576, employees: 2 },
+        { name: "Cuneo, Italy", lat: 44.39, lng: 7.551, employees: 1 },
+        { name: "Brazil", lat: -14.235, lng: -51.925, employees: 1 },
+        { name: "Avignon, France", lat: 43.949, lng: 4.805, employees: 1 },
+        { name: "Assam, India", lat: 26.2, lng: 92.937, employees: 1 },
+        { name: "Limassol, Cyprus", lat: 34.707, lng: 33.022, employees: 1 },
+        { name: "Belgium", lat: 50.85, lng: 4.351, employees: 1 },
+        { name: "Finland", lat: 61.924, lng: 25.748, employees: 1 },
         {
-          name: "United Kingdom",
-          lat: 51.6,
-          lng: -2,
-          employees: 116,
+          name: "Manila, Philippines",
+          lat: 14.599,
+          lng: 120.984,
+          employees: 5,
         },
+        { name: "United Kingdom", lat: 53.694, lng: -2.674, employees: 116 },
+        { name: "United States", lat: 38.883, lng: -77.032, employees: 2 },
       ];
 
-      const lowLevelLocations = [
+      const detailedLocations = [
+        { name: "Essex, UK", lat: 51.77, lng: 0.456, employees: 1 },
+        { name: "Liverpool, UK", lat: 53.41, lng: -2.978, employees: 1 },
+        { name: "Leicester, UK", lat: 52.639, lng: -1.125, employees: 2 },
+        { name: "Malvern, UK", lat: 52.11, lng: -2.327, employees: 1 },
+        { name: "Ivybridge, UK", lat: 50.393, lng: -3.918, employees: 1 },
+        { name: "Swansea, UK", lat: 51.621, lng: -3.943, employees: 1 },
+        { name: "Edinburgh, UK", lat: 55.953, lng: -3.189, employees: 2 },
+        { name: "Warrington, UK", lat: 53.39, lng: -2.587, employees: 1 },
+        { name: "Crawley, UK", lat: 51.115, lng: -0.186, employees: 1 },
+        { name: "Newport, UK", lat: 51.588, lng: -2.993, employees: 1 },
+        { name: "Exeter, UK", lat: 50.725, lng: -3.526, employees: 1 },
+        { name: "Leeds, UK", lat: 53.8, lng: -1.549, employees: 1 },
+        { name: "London, UK", lat: 51.507, lng: -0.128, employees: 11 },
+        { name: "Cardiff, UK", lat: 51.481, lng: -3.179, employees: 1 },
+        { name: "Plymouth, UK", lat: 50.375, lng: -4.143, employees: 2 },
+        { name: "Horsham, UK", lat: 51.062, lng: -0.327, employees: 1 },
+        { name: "Derby, UK", lat: 52.922, lng: -1.476, employees: 2 },
+        { name: "Hertfordshire, UK", lat: 51.809, lng: -0.237, employees: 1 },
+        { name: "Stockport, UK", lat: 53.409, lng: -2.157, employees: 1 },
+        { name: "Brighouse, UK", lat: 53.699, lng: -1.779, employees: 1 },
+        { name: "Surrey, UK", lat: 51.314, lng: -0.559, employees: 1 },
+        { name: "Devon, UK", lat: 50.715, lng: -3.53, employees: 1 },
+        { name: "Bude, UK", lat: 50.826, lng: -4.543, employees: 1 },
+        { name: "Droitwich, UK", lat: 52.268, lng: -2.156, employees: 1 },
+        { name: "Nottingham, UK", lat: 52.954, lng: -1.158, employees: 1 },
+        { name: "Birmingham, UK", lat: 52.486, lng: -1.89, employees: 1 },
+        { name: "Manchester, UK", lat: 53.483, lng: -2.244, employees: 1 },
+        { name: "Hayle, UK", lat: 50.183, lng: -5.423, employees: 1 },
+        { name: "Cambridge, UK", lat: 52.204, lng: 0.119, employees: 1 },
+        { name: "Ashford, UK", lat: 51.147, lng: 0.875, employees: 1 },
+        { name: "Llandudno, UK", lat: 53.324, lng: -3.829, employees: 1 },
         {
-          name: "Bristol",
-          lat: 51.454514,
-          lng: -2.58791,
-          employees: 43,
+          name: "Brighton, Brighton and Hove, UK",
+          lat: 50.822,
+          lng: -0.137,
+          employees: 1,
+        },
+        { name: "Bristol, UK", lat: 51.454, lng: -2.587, employees: 58 },
+        {
+          name: "Charlbury, Chipping Norton, UK",
+          lat: 51.872,
+          lng: -1.48,
+          employees: 28,
         },
         {
-          name: "Oxford",
-          lat: 51.8745,
-          lng: -1.479752,
-          employees: 53,
+          name: "North Carolina, USA",
+          lat: 35.782,
+          lng: -80.793,
+          employees: 1,
         },
         {
-          name: "London",
-          lat: 51.509865,
-          lng: -0.118092,
-          employees: 5,
-        },
-        {
-          name: "Manchester",
-          lat: 53.480759,
-          lng: -2.242631,
-          employees: 10,
-        },
-        {
-          name: "Edinburgh",
-          lat: 55.953251,
-          lng: -3.188267,
-          employees: 5,
+          name: "San Luis Obispo, CA, USA",
+          lat: 35.303,
+          lng: -120.662,
+          employees: 1,
         },
       ];
 
@@ -181,17 +227,16 @@
       });
 
       var map = L.map("map", {
-        minZoom: 0,
-        maxZoom: 6,
+        minZoom: 2,
+        maxZoom: 7,
       }).setView([51.454514, -1.257677], 4);
       L.tileLayer(
         "https://github.com/jhancock532/heatmap/raw/main/tiles/{z}/{x}/{y}.jpg"
       ).addTo(map);
 
       var lowLevelMarkers = new L.FeatureGroup();
-      var highLevelMarkers = new L.FeatureGroup();
 
-      lowLevelLocations.forEach((location) => {
+      detailedLocations.forEach((location) => {
         var marker = new L.Marker([location.lat, location.lng], {
           icon: new L.NumberedDivIcon({ number: location.employees }),
         });
@@ -205,29 +250,27 @@
         lowLevelMarkers.addLayer(marker);
       });
 
-      highLevelLocations.forEach((location) => {
-        var marker = new L.Marker([location.lat, location.lng], {
-          icon: new L.NumberedDivIcon({ number: location.employees }),
-        });
+      // highLevelLocations.forEach((location) => {
+      //   var marker = new L.Marker([location.lat, location.lng], {
+      //     icon: new L.NumberedDivIcon({ number: location.employees }),
+      //   });
 
-        marker
-          .bindPopup(
-            `There are ${location.employees} employees in ${location.name}.`
-          )
-          .openPopup();
+      //   marker
+      //     .bindPopup(
+      //       `There are ${location.employees} employees in ${location.name}.`
+      //     )
+      //     .openPopup();
 
-        highLevelMarkers.addLayer(marker);
-      });
+      //   highLevelMarkers.addLayer(marker);
+      // });
 
-      map.addLayer(highLevelMarkers);
+      // map.addLayer(highLevelMarkers);
 
       map.on("zoomend", function () {
         if (map.getZoom() < 6) {
           map.removeLayer(lowLevelMarkers);
-          map.addLayer(highLevelMarkers);
         } else {
           map.addLayer(lowLevelMarkers);
-          map.removeLayer(highLevelMarkers);
         }
       });
 
@@ -265,6 +308,10 @@
         }
       }
       // geoJSONLayer.addData(geoJson.features[0]);
+      map.setMaxBounds([
+        [-90, -180],
+        [90, 180],
+      ]);
     </script>
   </body>
 </html>
