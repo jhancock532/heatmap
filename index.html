@@ -4,7 +4,28 @@
     <title>Map App Demo</title>
     <link rel="stylesheet" href="/heatmap/leaflet.css" />
     <script src="/heatmap/leaflet.js"></script>
-    <!-- GeoJson fetched from https://geojson-maps.ash.ms/ -->
+    <!-- GeoJson fetched from https://geojson-maps.ash.ms/
+          Processed with the following script to remove unused properties:
+          // const processedGeoJson = {
+          //   type: "FeatureCollection",
+          //   features: [],
+          // };
+
+          // for (let i = 0; i < geoJson.features.length; i++) {
+          //   const element = geoJson.features[i];
+          //   const filteredCountry = {
+          //     type: "Feature",
+          //     geometry: element.geometry,
+          //     properties: {
+          //       name: element.properties.name,
+          //       name_long: element.properties.name_long,
+          //     },
+          //   };
+          //   processedGeoJson.features.push(filteredCountry);
+          // }
+
+          // console.log(processedGeoJson);
+    -->
     <script src="/heatmap/geo.js"></script>
     <style>
       html,
@@ -41,86 +62,118 @@
       .leaflet-container {
         background: rgb(241, 241, 241);
       }
+
+      .leaflet-popup-tip,
+      .leaflet-popup-content-wrapper {
+        background: rgb(37, 22, 87);
+        box-shadow: none;
+      }
+
+      .leaflet-popup-content-wrapper {
+        padding: 25px 55px 25px 30px;
+      }
+
+      .leaflet-popup-content {
+        font-family: Outfit-Medium, helvetica, arial, sans-serif;
+        font-size: 22px;
+        color: white;
+        margin: 0px;
+      }
+
+      .leaflet-container a.leaflet-popup-close-button {
+        color: white;
+        font-size: 26px;
+        margin: 10px 10px 0 0;
+      }
+
+      .leaflet-container a.leaflet-popup-close-button:hover {
+        color: white;
+        text-decoration: underline;
+      }
+
+      .stats {
+        position: absolute;
+        z-index: 10000;
+        padding: 30px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .logo {
+        width: 134px;
+      }
+
+      .divider {
+        height: 42px;
+        width: 1px;
+        background: #251657;
+        margin: 0 30px;
+        transform: translateY(8px);
+      }
+
+      .employee-total {
+        font-family: Outfit-Medium, helvetica, arial, sans-serif;
+        font-size: 22px;
+        color: #251657;
+        margin: 0px;
+        align-self: flex-end;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
 
+    <!-- Torchbox logo -->
+    <div class="stats">
+      <svg
+        class="logo"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 134 39"
+      >
+        <g clip-path="url(#a)">
+          <g fill="#251657">
+            <path d="M7.41 20.16H0V15.6h19.98v4.56H12.6v18.3H7.4v-18.3Z" />
+            <path
+              d="M15.76 30.4c0-1.19.21-2.3.63-3.33a8.3 8.3 0 0 1 8-5.23 9 9 0 0 1 3.5.67 8.14 8.14 0 0 1 4.47 4.56c.43 1.04.63 2.15.63 3.33 0 1.2-.21 2.3-.63 3.34a8.3 8.3 0 0 1-4.48 4.56 8.67 8.67 0 0 1-3.5.69 8.78 8.78 0 0 1-3.5-.69 8.3 8.3 0 0 1-4.5-4.56 8.95 8.95 0 0 1-.62-3.34Zm8.64 4.31a3.64 3.64 0 0 0 3.6-2.73 5.28 5.28 0 0 0 0-3.19 3.74 3.74 0 0 0-1.96-2.33 3.64 3.64 0 0 0-1.64-.36c-.62 0-1.16.12-1.66.36-.5.25-.9.57-1.22.97a4.9 4.9 0 0 0-.74 4.55c.18.51.42.98.74 1.4.32.41.72.73 1.22.97s1.04.36 1.66.36ZM35.07 22.38h4.73l.17 2.02c.42-.55.98-1.07 1.7-1.58.73-.5 1.65-.75 2.8-.75.42 0 .8.03 1.1.07.31.04.62.12.92.24l-.8 4.35c-.5-.16-1.1-.24-1.78-.24a3.9 3.9 0 0 0-2.82 1.05A3.92 3.92 0 0 0 40 30.5v7.94h-4.93V22.38ZM61.84 36.32A8.49 8.49 0 0 1 55.36 39c-1.3 0-2.48-.21-3.56-.63a7.93 7.93 0 0 1-4.48-4.5 9.06 9.06 0 0 1-.63-3.45c0-1.2.21-2.3.65-3.34a8.36 8.36 0 0 1 4.54-4.55 8.97 8.97 0 0 1 3.49-.67c1.46 0 2.73.24 3.8.72a8.32 8.32 0 0 1 2.71 1.92L58.9 27.7a5.76 5.76 0 0 0-1.34-1.1 3.96 3.96 0 0 0-2.09-.48c-.59 0-1.12.12-1.6.36a3.96 3.96 0 0 0-1.95 2.3 5.03 5.03 0 0 0 0 3.18 4.08 4.08 0 0 0 1.96 2.34c.47.26 1 .38 1.6.38.84 0 1.55-.16 2.12-.5a5.3 5.3 0 0 0 1.37-1.08l2.88 3.21ZM63.22 15.59h4.9v8.33a5.04 5.04 0 0 1 2.1-1.42c.87-.33 1.74-.5 2.64-.5a6 6 0 0 1 4.43 1.65c1.11 1.1 1.66 2.72 1.66 4.86v9.94h-4.9v-9.19c0-.93-.24-1.66-.73-2.2a2.5 2.5 0 0 0-1.91-.78 3.19 3.19 0 0 0-2.44 1.07c-.27.32-.48.7-.62 1.11-.13.43-.2.87-.2 1.35v8.64h-4.93V15.6ZM81.78 15.59h4.93v7.98a4.57 4.57 0 0 1 1.86-1.12 7.28 7.28 0 0 1 5.4.24c.9.43 1.64 1.02 2.25 1.77.6.73 1.08 1.59 1.4 2.57.32.97.48 2 .48 3.09 0 1.3-.21 2.5-.63 3.6a7.77 7.77 0 0 1-4.78 4.64c-1.17.43-2.5.65-3.98.65-1.37 0-2.67-.12-3.89-.37-1.22-.26-2.24-.51-3.03-.8V15.6h-.01Zm4.93 18.95c.27.12.58.2.91.25.34.06.8.09 1.4.09 1.3 0 2.31-.43 3.02-1.28a4.93 4.93 0 0 0 1.09-3.32 6 6 0 0 0-.19-1.47 4 4 0 0 0-.56-1.29 2.78 2.78 0 0 0-2.44-1.29c-1.1 0-1.9.31-2.44.92-.52.6-.79 1.4-.79 2.4v4.99ZM99.43 30.4c0-1.19.21-2.3.63-3.33a8.3 8.3 0 0 1 8-5.23 9 9 0 0 1 3.5.67 8.15 8.15 0 0 1 4.47 4.56c.43 1.04.63 2.15.63 3.33 0 1.2-.21 2.3-.63 3.34a8.3 8.3 0 0 1-4.47 4.56 8.67 8.67 0 0 1-3.5.69 8.78 8.78 0 0 1-3.51-.69 8.3 8.3 0 0 1-4.5-4.56 8.94 8.94 0 0 1-.62-3.34Zm8.64 4.31a3.64 3.64 0 0 0 3.6-2.73 5.27 5.27 0 0 0 0-3.19 3.96 3.96 0 0 0-1.95-2.33 3.64 3.64 0 0 0-1.65-.36c-.62 0-1.16.12-1.66.36-.5.25-.9.57-1.22.97-.32.4-.56.86-.74 1.36a4.9 4.9 0 0 0 0 3.2c.18.5.42.97.74 1.39.32.41.72.73 1.22.97a3.7 3.7 0 0 0 1.66.36Z"
+            />
+            <path
+              d="m122.28 30.4-5.86-8.02h5.9l2.88 4.29 2.9-4.3h5.4l-5.66 7.68 6.16 8.4h-5.9l-3.18-4.62-3.22 4.62h-5.39l5.97-8.05Z"
+            />
+          </g>
+          <path
+            d="M133.8 11.09c-.03-.21-.3-.27-.42-.08a6.24 6.24 0 0 1-2.13 2.38v-.12c-.1-7.78-5.73-12-7.72-13.23-.18-.12-.41.08-.32.28 1.3 2.7.82 5.24-1.36 7.72-.42.45-.88 1.04-1.26 1.63 0 0-.47.68-.91 1.62l-.03-.03c-.9-1.36-1.1-3-1.14-3.9-.01-.2-.28-.29-.4-.13a8.73 8.73 0 0 0-1.68 4.09c-.35 4.18 2.13 8.45 6.4 9.59.2.05.34-.16.22-.34a4.62 4.62 0 0 1-.6-2.49c0-2.48 2.68-6.24 2.68-6.24s2.68 3.76 2.68 6.24c0 1.09-.23 1.92-.6 2.5-.11.18.04.4.22.34 4.14-1.07 6.09-4.89 6.38-7.23.14-1.03.06-1.98-.01-2.6Z"
+            fill="#FD5765"
+          />
+        </g>
+        <defs>
+          <clipPath id="a"><path fill="#fff" d="M0 0h134v39H0z" /></clipPath>
+        </defs>
+      </svg>
+      <div class="divider"></div>
+      <p class="employee-total">133 Co-Owners and counting!</p>
+    </div>
+
     <script>
-      // console.log(geoJson);
+      const POPUP_MAX_WIDTH = 560;
 
-      // const processedGeoJson = {
-      //   type: "FeatureCollection",
-      //   features: [],
-      // };
+      /* Step One: add high level location information. */
+      // If there are more than two employees in different parts of a country, include this as a summary location.
+      const summaryLocations = [
+        {
+          name: "the United Kingdom",
+          lat: 53.694,
+          lng: -2.674,
+          employees: 116,
+        },
+        { name: "the United States", lat: 38.883, lng: -77.032, employees: 2 },
+      ];
 
-      // for (let i = 0; i < geoJson.features.length; i++) {
-      //   const element = geoJson.features[i];
-      //   const filteredCountry = {
-      //     type: "Feature",
-      //     geometry: element.geometry,
-      //     properties: {
-      //       name: element.properties.name,
-      //       name_long: element.properties.name_long,
-      //     },
-      //   };
-      //   processedGeoJson.features.push(filteredCountry);
-      // }
-
-      // console.log(processedGeoJson);
-
-      const TALLIED_LOCATIONS = {
-        "Essex, UK": 1,
-        "Liverpool, UK": 1,
-        "Leicester, UK": 2,
-        "Malvern, UK": 1,
-        "Ivybridge, UK": 1,
-        "Swansea, UK": 1,
-        "Edinburgh, UK": 2,
-        "Warrington, UK": 1,
-        "Crawley, UK": 1,
-        "Newport, UK": 1,
-        "Exeter, UK": 1,
-        "Leeds, UK": 1,
-        "London, UK": 11,
-        "Cardiff, UK": 1,
-        "Plymouth, UK": 2,
-        "Horsham, UK": 1,
-        "Derby, UK": 2,
-        "Hertfordshire, UK": 1,
-        "Stockport, UK": 1,
-        "Brighouse, UK": 1,
-        "Surrey, UK": 1,
-        "Devon, UK": 1,
-        "Bude, UK": 1,
-        "Droitwich, UK": 1,
-        "Nottingham, UK": 1,
-        "Birmingham, UK": 1,
-        "Manchester, UK": 1,
-        "Hayle, UK": 1,
-        "Cambridge, UK": 1,
-        "Ashford, UK": 1,
-        "Llandudno, UK": 1,
-        "Brighton, Brighton and Hove, UK": 1,
-        "Bristol, UK": 58,
-        "Charlbury, Chipping Norton, UK": 28,
-        "Manila, Metro Manila, Philippines": 5,
-        "Budapest, Hungary": 1,
-        "Alberta, Canada": 2,
-        "Cuneo, Italy": 1,
-        Brazil: 1,
-        "Avignon, France": 1,
-        "Assam, India": 1,
-        "Limassol, Cyprus": 1,
-        Belgium: 1,
-        Finland: 1,
-        "North Carolina, USA": 1,
-        "San Luis Obispo, CA, USA": 1,
-        "United Kingdom": 116,
-        "United States": 2,
-      };
-
-      const highlevelLocations = [
+      // If there all the employees of the country are in the same location, include this as a country location.
+      const countryLocations = [
         { name: "Budapest, Hungary", lat: 47.497, lng: 19.04, employees: 1 },
         { name: "Alberta, Canada", lat: 53.933, lng: -116.576, employees: 2 },
         { name: "Cuneo, Italy", lat: 44.39, lng: 7.551, employees: 1 },
@@ -136,10 +189,11 @@
           lng: 120.984,
           employees: 5,
         },
-        { name: "United Kingdom", lat: 53.694, lng: -2.674, employees: 116 },
-        { name: "United States", lat: 38.883, lng: -77.032, employees: 2 },
       ];
 
+      /* Step Two: add detailed location information */
+      // Use this to add a marker to the map for a location within a country in `summaryLocations`.
+      // If you've added the employee location to the `countryLocations` array, you don't need to add it here.
       const detailedLocations = [
         { name: "Essex, UK", lat: 51.77, lng: 0.456, employees: 1 },
         { name: "Liverpool, UK", lat: 53.41, lng: -2.978, employees: 1 },
@@ -173,14 +227,14 @@
         { name: "Ashford, UK", lat: 51.147, lng: 0.875, employees: 1 },
         { name: "Llandudno, UK", lat: 53.324, lng: -3.829, employees: 1 },
         {
-          name: "Brighton, Brighton and Hove, UK",
+          name: "Brighton, UK",
           lat: 50.822,
           lng: -0.137,
           employees: 1,
         },
         { name: "Bristol, UK", lat: 51.454, lng: -2.587, employees: 58 },
         {
-          name: "Charlbury, Chipping Norton, UK",
+          name: "Charlbury, Oxfordshire, UK",
           lat: 51.872,
           lng: -1.48,
           employees: 28,
@@ -199,6 +253,7 @@
         },
       ];
 
+      // A custom NumberedDivIcon class to render the number of employees in a location.
       L.NumberedDivIcon = L.Icon.extend({
         options: {
           iconUrl: null,
@@ -220,94 +275,102 @@
           return containerDiv;
         },
 
-        //you could change this to add a shadow like in the normal marker if you really wanted
         createShadow: function () {
           return null;
         },
       });
 
+      // Initialize the Leaflet map.
       var map = L.map("map", {
         minZoom: 2,
-        maxZoom: 7,
+        maxZoom: 8,
       }).setView([51.454514, -1.257677], 4);
       L.tileLayer(
-        "https://github.com/jhancock532/heatmap/raw/main/tiles/{z}/{x}/{y}.jpg"
+        // Fetch map tiles from the GitHub repository, rendered using QGIS and QTiles.
+        "https://github.com/jhancock532/heatmap/raw/main/tiles/{z}/{x}/{y}.jpg",
+        {
+          // We've rendered the earth to zoom level 6 - don't allow Leaflet to request higher resolution tiles.
+          maxNativeZoom: 6,
+          // Simulate zooming in closer than level 6 by letting Leaflet scale up the tiles.
+          maxZoom: 8,
+        }
       ).addTo(map);
 
-      var lowLevelMarkers = new L.FeatureGroup();
+      const detailedLocationMarkers = new L.FeatureGroup();
 
-      detailedLocations.forEach((location) => {
-        var marker = new L.Marker([location.lat, location.lng], {
+      // Render a popup marker for each detailed location and countryLocation.
+      detailedLocations.concat(countryLocations).forEach((location) => {
+        const marker = new L.Marker([location.lat, location.lng], {
           icon: new L.NumberedDivIcon({ number: location.employees }),
         });
 
+        const popupText = `We have ${location.employees} ${
+          location.employees > 1 ? "employees" : "employee"
+        } in ${location.name}.`;
+
         marker
-          .bindPopup(
-            `There are ${location.employees} employees in ${location.name}.`
-          )
+          .bindPopup(popupText, {
+            maxWidth: POPUP_MAX_WIDTH,
+          })
           .openPopup();
 
-        lowLevelMarkers.addLayer(marker);
+        detailedLocationMarkers.addLayer(marker);
       });
 
-      // highLevelLocations.forEach((location) => {
-      //   var marker = new L.Marker([location.lat, location.lng], {
-      //     icon: new L.NumberedDivIcon({ number: location.employees }),
-      //   });
-
-      //   marker
-      //     .bindPopup(
-      //       `There are ${location.employees} employees in ${location.name}.`
-      //     )
-      //     .openPopup();
-
-      //   highLevelMarkers.addLayer(marker);
-      // });
-
-      // map.addLayer(highLevelMarkers);
-
-      map.on("zoomend", function () {
-        if (map.getZoom() < 6) {
-          map.removeLayer(lowLevelMarkers);
-        } else {
-          map.addLayer(lowLevelMarkers);
-        }
-      });
-
-      const myStyle = {
+      const geoJSONStyling = {
         color: "rgba(72, 28, 217, 1)",
         fill: "rgba(179, 156, 255, 1)",
         weight: 2,
         opacity: 1,
       };
 
-      var geoJSONLayer = L.geoJSON([], {
-        style: myStyle,
+      const geoJSONLayer = L.geoJSON([], {
+        style: geoJSONStyling,
+        onEachFeature: function (feature, layer) {
+          const employees = highlevelLocations.find((value) =>
+            value.name.includes(feature.properties.name_long)
+          ).employees;
+
+          const name = highlevelLocations.find((value) =>
+            value.name.includes(feature.properties.name_long)
+          ).name;
+
+          const popupText = `We have ${employees} ${
+            employees > 1 ? "employees" : "employee"
+          } in ${name}.`;
+
+          layer.bindPopup(popupText, {
+            maxWidth: POPUP_MAX_WIDTH,
+          });
+        },
       }).addTo(map);
 
+      const highlevelLocations = summaryLocations.concat(countryLocations);
+
       for (let i = 0; i < geoJson.features.length; i++) {
-        let countryIncludedInMap = false;
-
-        for (let j = 0; j < Object.keys(TALLIED_LOCATIONS).length; j++) {
-          if (
-            Object.keys(TALLIED_LOCATIONS)[j].includes(
-              geoJson.features[i].properties.name_long
-            )
-          ) {
-            countryIncludedInMap = true;
-          }
-        }
-
-        // background: linear-gradient(0deg, #481CD9, #481CD9),
-        //linear-gradient(0deg, #B39CFF, #B39CFF);
-
-        //border: 2px solid
-
-        if (countryIncludedInMap) {
+        if (
+          highlevelLocations.some((value) =>
+            value.name.includes(geoJson.features[i].properties.name_long)
+          )
+        ) {
           geoJSONLayer.addData(geoJson.features[i]);
         }
       }
-      // geoJSONLayer.addData(geoJson.features[0]);
+
+      map.on("zoomend", function () {
+        if (map.getZoom() < 6) {
+          map.removeLayer(detailedLocationMarkers);
+        } else {
+          map.addLayer(detailedLocationMarkers);
+        }
+        if (map.getZoom() < 8) {
+          map.addLayer(geoJSONLayer);
+        } else {
+          map.removeLayer(geoJSONLayer);
+        }
+      });
+
+      // Prevent the user from scrolling the map beyond the edge of the world.
       map.setMaxBounds([
         [-90, -180],
         [90, 180],
